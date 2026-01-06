@@ -87,10 +87,10 @@ export default function Settings() {
       </Box>
 
       {/* Info Alert */}
-      <Alert severity="info" sx={{ mb: 3 }}>
-        <AlertTitle>Development Mode</AlertTitle>
-        Currently using Firebase emulators and mock data. Some features require Firebase
-        collections to be created.
+      <Alert severity="success" sx={{ mb: 3 }}>
+        <AlertTitle>Connected to Firebase</AlertTitle>
+        Your household planner is connected to Firestore. Data is synced in real-time
+        across all devices.
       </Alert>
 
       {/* Settings Sections */}

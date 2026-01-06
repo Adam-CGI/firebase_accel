@@ -27,19 +27,36 @@ import {
   Person as PersonIcon,
   CalendarMonth as CalendarIcon,
 } from '@mui/icons-material'
+import { useNavigate } from 'react-router-dom'
 import { collection, query, where, onSnapshot, orderBy, limit } from 'firebase/firestore'
 import { db } from '../../firebase'
 import { useAuth } from '../auth/AuthContext'
 
 export default function Dashboard() {
   const { user } = useAuth()
+  const navigate = useNavigate()
   const [todayTasks, setTodayTasks] = useState([])
   const [upcomingEvents, setUpcomingEvents] = useState([])
+  const [people, setPeople] = useState([])
   const [stats, setStats] = useState({
     completedToday: 0,
     overdueCount: 0,
     upcomingCount: 0,
   })
+
+  // Fetch people from Firestore
+  useEffect(() => {
+    if (!user) return
+    const q = query(collection(db, 'people'), orderBy('createdAt'))
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const peopleData = snapshot.docs.map(doc => ({
+        name: doc.data().name,
+        color: doc.data().color || '#6B7280',
+      }))
+      setPeople(peopleData)
+    })
+    return () => unsubscribe()
+  }, [user])
 
   // Fetch today's tasks
   useEffect(() => {
@@ -139,13 +156,8 @@ export default function Dashboard() {
   }
 
   const getPersonColor = (personName) => {
-    const colors = {
-      'Mom': '#3B82F6',
-      'Dad': '#8B5CF6',
-      'Emma': '#10B981',
-      'Liam': '#F59E0B',
-    }
-    return colors[personName] || '#6B7280'
+    const person = people.find(p => p.name === personName)
+    return person?.color || '#6B7280'
   }
 
   const StatCard = ({ icon, label, value, color }) => (
@@ -222,6 +234,7 @@ export default function Dashboard() {
             variant="contained"
             startIcon={<AddIcon />}
             size="large"
+            onClick={() => navigate('/tasks')}
             sx={{ flex: { xs: '1 1 100%', sm: '0 1 auto' } }}
           >
             Add Task
@@ -231,6 +244,7 @@ export default function Dashboard() {
             color="secondary"
             startIcon={<CalendarIcon />}
             size="large"
+            onClick={() => navigate('/week')}
             sx={{ flex: { xs: '1 1 100%', sm: '0 1 auto' } }}
           >
             New Event
@@ -239,6 +253,7 @@ export default function Dashboard() {
             variant="outlined"
             startIcon={<HomeIcon />}
             size="large"
+            onClick={() => navigate('/rooms')}
             sx={{ flex: { xs: '1 1 100%', sm: '0 1 auto' } }}
           >
             Manage Rooms
@@ -354,16 +369,16 @@ export default function Dashboard() {
                 Family Activity
               </Typography>
               <Stack spacing={2}>
-                {['Mom', 'Dad', 'Emma', 'Liam'].map((person, i) => (
-                  <Stack key={person} direction="row" justifyContent="space-between" alignItems="center">
+                {people.map((person) => (
+                  <Stack key={person.name} direction="row" justifyContent="space-between" alignItems="center">
                     <Stack direction="row" spacing={1} alignItems="center">
-                      <Avatar sx={{ width: 32, height: 32, bgcolor: ['#3B82F6', '#8B5CF6', '#10B981', '#F59E0B'][i] }}>
-                        {person[0]}
+                      <Avatar sx={{ width: 32, height: 32, bgcolor: person.color }}>
+                        {person.name[0]}
                       </Avatar>
-                      <Typography variant="body2">{person}</Typography>
+                      <Typography variant="body2">{person.name}</Typography>
                     </Stack>
                     <Chip
-                      label={`${Math.floor(Math.random() * 5)} tasks`}
+                      label="View tasks"
                       size="small"
                       variant="outlined"
                     />

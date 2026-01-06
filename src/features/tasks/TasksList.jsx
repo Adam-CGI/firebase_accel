@@ -44,6 +44,8 @@ import { useAuth } from '../auth/AuthContext'
 export default function TasksList() {
   const { user } = useAuth()
   const [tasks, setTasks] = useState([])
+  const [rooms, setRooms] = useState([])
+  const [people, setPeople] = useState([])
   const [filterRoom, setFilterRoom] = useState('all')
   const [filterAssignee, setFilterAssignee] = useState('all')
   const [filterStatus, setFilterStatus] = useState('active')
@@ -58,9 +60,31 @@ export default function TasksList() {
     dueDate: '',
   })
 
-  const rooms = ['Kitchen', 'Living Room', 'Bedroom', 'Bathroom', 'Study', 'Garage']
-  const people = ['Mom', 'Dad', 'Emma', 'Liam']
   const daysOfWeek = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+
+  // Fetch rooms from Firestore
+  useEffect(() => {
+    if (!user) return
+    const q = query(collection(db, 'rooms'), orderBy('createdAt'))
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const roomsData = snapshot.docs
+        .filter(doc => !doc.data().isArchived)
+        .map(doc => doc.data().name)
+      setRooms(roomsData)
+    })
+    return () => unsubscribe()
+  }, [user])
+
+  // Fetch people from Firestore
+  useEffect(() => {
+    if (!user) return
+    const q = query(collection(db, 'people'), orderBy('createdAt'))
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const peopleData = snapshot.docs.map(doc => doc.data().name)
+      setPeople(peopleData)
+    })
+    return () => unsubscribe()
+  }, [user])
 
   // Fetch tasks from Firestore
   useEffect(() => {

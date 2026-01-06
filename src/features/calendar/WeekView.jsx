@@ -34,6 +34,7 @@ export default function WeekView() {
   const { user } = useAuth()
   const [currentWeek, setCurrentWeek] = useState(new Date())
   const [events, setEvents] = useState([])
+  const [people, setPeople] = useState([])
   const [openDialog, setOpenDialog] = useState(false)
   const [newEvent, setNewEvent] = useState({
     title: '',
@@ -44,12 +45,19 @@ export default function WeekView() {
     description: '',
   })
 
-  const people = [
-    { name: 'Mom', color: '#3B82F6' },
-    { name: 'Dad', color: '#8B5CF6' },
-    { name: 'Emma', color: '#10B981' },
-    { name: 'Liam', color: '#F59E0B' },
-  ]
+  // Fetch people from Firestore
+  useEffect(() => {
+    if (!user) return
+    const q = query(collection(db, 'people'), orderBy('createdAt'))
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const peopleData = snapshot.docs.map(doc => ({
+        name: doc.data().name,
+        color: doc.data().color || '#6B7280',
+      }))
+      setPeople(peopleData)
+    })
+    return () => unsubscribe()
+  }, [user])
 
   // Get start and end of current week
   const getWeekDates = (date) => {
