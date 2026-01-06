@@ -28,8 +28,10 @@ import {
 } from '@mui/icons-material'
 import { collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot, query, where, orderBy, serverTimestamp } from 'firebase/firestore'
 import { db } from '../../firebase'
+import { useAuth } from '../auth/AuthContext'
 
 export default function WeekView() {
+  const { user } = useAuth()
   const [currentWeek, setCurrentWeek] = useState(new Date())
   const [events, setEvents] = useState([])
   const [openDialog, setOpenDialog] = useState(false)
