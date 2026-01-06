@@ -222,7 +222,14 @@ export default function App() {
       <TopBar />
       <Box component="main" sx={{ flexGrow: 1, bgcolor: 'background.default' }}>
         <Routes>
-          <Route path="/" element={<Dashboard />} />
+          <Route
+            path="/"
+            element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            }
+          />
           <Route
             path="/rooms"
             element={
@@ -231,10 +238,38 @@ export default function App() {
               </ProtectedRoute>
             }
           />
-          <Route path="/tasks" element={<TasksList />} />
-          <Route path="/week" element={<WeekView />} />
-          <Route path="/people" element={<PeopleList />} />
-          <Route path="/settings" element={<Settings />} />
+          <Route
+            path="/tasks"
+            element={
+              <ProtectedRoute>
+                <TasksList />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/week"
+            element={
+              <ProtectedRoute>
+                <WeekView />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/people"
+            element={
+              <ProtectedRoute>
+                <PeopleList />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/settings"
+            element={
+              <ProtectedRoute>
+                <Settings />
+              </ProtectedRoute>
+            }
+          />
         </Routes>
       </Box>
     </Box>
