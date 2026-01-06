@@ -6,6 +6,8 @@ import { useAuth } from '../features/auth/AuthContext.jsx'
 export default function ProtectedRoute({ children }) {
   const { user, loading, isAllowed, error } = useAuth()
 
+  console.log('[ProtectedRoute] Checking access:', { hasUser: !!user, loading, isAllowed })
+
   if (loading) {
     return (
       <Container maxWidth="sm" sx={{ py: 8 }}>

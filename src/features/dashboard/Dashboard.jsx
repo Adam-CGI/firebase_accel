@@ -44,6 +44,7 @@ export default function Dashboard() {
   // Fetch today's tasks
   useEffect(() => {
     if (!user) return
+
     const today = new Date()
     today.setHours(0, 0, 0, 0)
     const tomorrow = new Date(today)
@@ -57,17 +58,22 @@ export default function Dashboard() {
       limit(10)
     )
 
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const tasks = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }))
-      setTodayTasks(tasks)
+    const unsubscribe = onSnapshot(q, 
+      (snapshot) => {
+        const tasks = snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }))
+        setTodayTasks(tasks)
 
-      // Calculate stats
-      const completed = tasks.filter(t => t.completed).length
-      setStats(prev => ({ ...prev, completedToday: completed }))
-    })
+        // Calculate stats
+        const completed = tasks.filter(t => t.completed).length
+        setStats(prev => ({ ...prev, completedToday: completed }))
+      },
+      (error) => {
+        console.error('[Dashboard] Error fetching today tasks:', error)
+      }
+    )
 
     return () => unsubscribe()
   }, [user])
