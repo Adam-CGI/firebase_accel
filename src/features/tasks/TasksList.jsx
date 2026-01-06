@@ -39,8 +39,10 @@ import {
 } from '@mui/icons-material'
 import { collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot, query, orderBy, serverTimestamp } from 'firebase/firestore'
 import { db } from '../../firebase'
+import { useAuth } from '../auth/AuthContext'
 
 export default function TasksList() {
+  const { user } = useAuth()
   const [tasks, setTasks] = useState([])
   const [filterRoom, setFilterRoom] = useState('all')
   const [filterAssignee, setFilterAssignee] = useState('all')
@@ -62,6 +64,7 @@ export default function TasksList() {
 
   // Fetch tasks from Firestore
   useEffect(() => {
+    if (!user) return
     const q = query(collection(db, 'tasks'), orderBy('createdAt', 'desc'))
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const tasksData = snapshot.docs.map((doc) => ({
@@ -71,7 +74,7 @@ export default function TasksList() {
       setTasks(tasksData)
     })
     return () => unsubscribe()
-  }, [])
+  }, [user])
 
   const handleAddTask = async () => {
     if (!newTask.title.trim()) return

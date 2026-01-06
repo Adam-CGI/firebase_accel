@@ -29,6 +29,7 @@ import {
 } from '@mui/icons-material'
 import { collection, addDoc, updateDoc, deleteDoc, doc, onSnapshot, query, orderBy, serverTimestamp } from 'firebase/firestore'
 import { db } from '../../firebase'
+import { useAuth } from '../auth/AuthContext'
 
 const COLOR_OPTIONS = [
   { name: 'Blue', value: '#3B82F6' },
@@ -42,6 +43,7 @@ const COLOR_OPTIONS = [
 ]
 
 export default function PeopleList() {
+  const { user } = useAuth()
   const [people, setPeople] = useState([])
   const [openDialog, setOpenDialog] = useState(false)
   const [editingPerson, setEditingPerson] = useState(null)
@@ -53,6 +55,7 @@ export default function PeopleList() {
 
   // Fetch people from Firestore
   useEffect(() => {
+    if (!user) return
     const q = query(collection(db, 'people'), orderBy('createdAt'))
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const peopleData = snapshot.docs.map((doc) => ({
@@ -62,7 +65,7 @@ export default function PeopleList() {
       setPeople(peopleData)
     })
     return () => unsubscribe()
-  }, [])
+  }, [user])
 
   const handleOpenDialog = (person = null) => {
     if (person) {

@@ -29,8 +29,10 @@ import {
 } from '@mui/icons-material'
 import { collection, query, where, onSnapshot, orderBy, limit } from 'firebase/firestore'
 import { db } from '../../firebase'
+import { useAuth } from '../auth/AuthContext'
 
 export default function Dashboard() {
+  const { user } = useAuth()
   const [todayTasks, setTodayTasks] = useState([])
   const [upcomingEvents, setUpcomingEvents] = useState([])
   const [stats, setStats] = useState({
@@ -41,6 +43,7 @@ export default function Dashboard() {
 
   // Fetch today's tasks
   useEffect(() => {
+    if (!user) return
     const today = new Date()
     today.setHours(0, 0, 0, 0)
     const tomorrow = new Date(today)
@@ -67,10 +70,11 @@ export default function Dashboard() {
     })
 
     return () => unsubscribe()
-  }, [])
+  }, [user])
 
   // Fetch upcoming events
   useEffect(() => {
+    if (!user) return
     const today = new Date().toISOString().split('T')[0]
     const weekFromNow = new Date()
     weekFromNow.setDate(weekFromNow.getDate() + 7)
@@ -99,10 +103,11 @@ export default function Dashboard() {
     })
 
     return () => unsubscribe()
-  }, [])
+  }, [user])
 
   // Fetch overdue tasks count
   useEffect(() => {
+    if (!user) return
     const today = new Date().toISOString().split('T')[0]
 
     const q = query(
@@ -116,7 +121,7 @@ export default function Dashboard() {
     })
 
     return () => unsubscribe()
-  }, [])
+  }, [user])
 
   const formatTime = (time) => {
     if (!time) return ''

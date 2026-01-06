@@ -66,6 +66,7 @@ export default function WeekView() {
 
   // Fetch events from Firestore
   useEffect(() => {
+    if (!user) return
     const startOfWeek = weekDates[0]
     const endOfWeek = weekDates[6]
     const q = query(
@@ -83,7 +84,7 @@ export default function WeekView() {
       setEvents(eventsData)
     })
     return () => unsubscribe()
-  }, [currentWeek])
+  }, [currentWeek, user])
 
   const handlePreviousWeek = () => {
     const prev = new Date(currentWeek)

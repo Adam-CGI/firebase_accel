@@ -35,6 +35,7 @@ import {
   updateDoc,
   doc,
 } from 'firebase/firestore'
+import { useAuth } from '../auth/AuthContext'
 
 function CreateRoomForm({ onCreated }) {
   const [name, setName] = useState('')
@@ -156,9 +157,11 @@ function RoomRow({ room }) {
 }
 
 export default function RoomsList() {
+  const { user } = useAuth()
   const [rooms, setRooms] = useState([])
 
   useEffect(() => {
+    if (!user) return
     const roomsCol = collection(db, 'rooms')
     const q = query(roomsCol, orderBy('createdAt'))
     const unsub = onSnapshot(q, (snap) => {
@@ -166,7 +169,7 @@ export default function RoomsList() {
       setRooms(list)
     })
     return () => unsub()
-  }, [])
+  }, [user])
 
   const activeRooms = useMemo(() => rooms.filter((r) => !r.isArchived), [rooms])
   const archivedRooms = useMemo(() => rooms.filter((r) => r.isArchived), [rooms])
