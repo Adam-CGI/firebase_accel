@@ -2,10 +2,22 @@ name: Deploy to Firebase Hosting (Preview)
 
 on:
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    paths:
+      - 'src/**'
+      - 'public/**'
+      - 'index.html'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'vite.config.js'
+      - 'firebase.json'
+      - '.firebaserc'
+      - '.github/workflows/firebase-hosting-pull-request.yml'
 
 permissions:
   contents: read
   pull-requests: write
+  checks: write
 
 concurrency:
   group: pr-preview-${{ github.event.pull_request.number }}
@@ -13,8 +25,9 @@ concurrency:
 
 jobs:
   build_and_preview:
-    if: ${{ github.event.pull_request.head.repo.full_name == github.repository }}
+    if: ${{ !github.event.pull_request.draft && github.event.pull_request.head.repo.full_name == github.repository }}
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
 
@@ -22,6 +35,7 @@ jobs:
         with:
           node-version: 22
           cache: npm
+          cache-dependency-path: package-lock.json
 
       - run: npm ci
       - run: npm run build
@@ -31,4 +45,6 @@ jobs:
           repoToken: "${{ secrets.GITHUB_TOKEN }}"
           firebaseServiceAccount: "${{ secrets.FIREBASE_SERVICE_ACCOUNT }}"
           projectId: cgi-firebase-accel-ag-01
-          expires: 7d
+          channelId: pr-${{ github.event.pull_request.number }}
+          expires: 3d
+          firebaseToolsVersion: 15.1.0
