@@ -6,6 +6,7 @@ on:
 permissions:
   contents: read
   pull-requests: write
+  checks: write
 
 concurrency:
   group: pr-preview-${{ github.event.pull_request.number }}
@@ -25,6 +26,9 @@ jobs:
 
       - run: npm ci
       - run: npm run build
+      - name: Verify build output exists
+        run: |
+          test -f dist/index.html || { echo "Build output missing: dist/index.html"; exit 1; }
 
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
