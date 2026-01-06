@@ -158,11 +158,37 @@ To enhance the PWA, update the manifest and replace placeholder icons with your 
 2. Ensure `npm run build` produces `dist/index.html`
 3. Verify Node.js version is v22.x in the workflow files
 
+### Deploy Fails with "Authorization failed" / "PERMISSION_DENIED"
+
+**Error**: `Authorization failed. This account is missing the following required permissions on project cgi-firebase-accel-ag-01`
+
+**Cause**: The service account in the `FIREBASE_SERVICE_ACCOUNT` secret lacks the required Firebase IAM permissions.
+
+**Solution**: Update the service account's IAM role in the Firebase Console:
+
+1. Go to [Firebase Console](https://console.firebase.google.com) > **Project Settings** > **Service Accounts**
+2. Find the service account used in the `FIREBASE_SERVICE_ACCOUNT` secret (email format: `*@*.iam.gserviceaccount.com`)
+3. Click on the service account to open it in Google Cloud Console
+4. In the Google Cloud Console (**IAM & Admin** > **IAM**):
+   - Ensure the service account has one of these roles:
+     - `Firebase Admin` (full access) — **Recommended**
+     - `Firebase Hosting Admin` (hosting-only access)
+     - Or custom roles with permissions: `firebase.projects.get`, `firebasehosting.sites.update`, `firebasehosting.sites.create`
+5. Save and wait 30–60 seconds for permissions to propagate
+6. Retry the workflow
+
+**Verify locally**:
+```bash
+export GOOGLE_APPLICATION_CREDENTIALS=/path/to/service-account.json
+firebase deploy --project cgi-firebase-accel-ag-01 --debug
+```
+
 ### Preview Not Posted to PR
 
-1. Ensure `FIREBASE_SERVICE_ACCOUNT` secret is set correctly
+1. Ensure `FIREBASE_SERVICE_ACCOUNT` secret is set correctly and has proper permissions (see above)
 2. Check that the PR branch is in the same repository (not a fork)
 3. Verify the Firebase project ID matches `cgi-firebase-accel-ag-01`
+4. Check GitHub Actions logs for specific error messages
 
 ### Manual Deploy Fails
 
@@ -172,8 +198,9 @@ To enhance the PWA, update the manifest and replace placeholder icons with your 
    # or use a service account JSON file
    export GOOGLE_APPLICATION_CREDENTIALS=/path/to/service-account.json
    ```
-2. Verify the service account has Firebase Hosting Admin permissions
+2. Verify the service account has Firebase Hosting Admin permissions (see "Deploy Fails with Authorization" above)
 3. Run `firebase use cgi-firebase-accel-ag-01` to set the project
+4. Run `firebase deploy --debug` to see detailed error output
 
 ## Links
 
