@@ -2,7 +2,7 @@
   max-width: 1280px;
   margin: 0 auto;
   padding: 2rem;
-  text-align: center;
+  text-align: left;
 }
 
 .logo {
@@ -40,3 +40,22 @@
 .read-the-docs {
   color: #888;
 }
+
+/* Minimal app layout */
+.app main { padding-top: 1rem; }
+.topbar { display: flex; align-items: center; gap: 1rem; justify-content: space-between; border-bottom: 1px solid #eee; padding-bottom: .5rem; }
+.brand { display: flex; align-items: center; gap: .5rem; }
+.badge { font-size: .75rem; background: #eee; padding: .1rem .4rem; border-radius: .25rem; }
+.badge.success { background: #d9fdd3; }
+.nav { display: flex; gap: .75rem; }
+.nav a { text-decoration: none; color: inherit; padding: .25rem .5rem; border-radius: .25rem; }
+.nav a.active { background: #f0f0f0; }
+.user { display: flex; align-items: center; gap: .5rem; }
+.btn { padding: .4rem .6rem; border: 1px solid #ddd; border-radius: .25rem; background: white; cursor: pointer; }
+.btn:hover { background: #f7f7f7; }
+.chip { display: flex; align-items: center; gap: .5rem; }
+.chip img { width: 24px; height: 24px; border-radius: 50%; }
+.chip .warn { color: #b30000; font-size: .8rem; }
+.content { padding-top: 1rem; }
+.row { display: flex; align-items: center; gap: .5rem; padding: .25rem 0; }
+.row .actions { display: flex; gap: .5rem; margin-left: auto; }
